@@ -1,13 +1,14 @@
 name: Test CI/CD
+
 on:
   push:        # Déclenche le workflow à chaque push
     branches:
-      - experiment 
+      - experiment
   workflow_dispatch:
+
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
