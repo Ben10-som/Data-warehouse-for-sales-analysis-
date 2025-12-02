@@ -1,1 +1,0 @@
-# Version Infrastruce as Code de la partie Cloud : Cloudformation

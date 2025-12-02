@@ -1,1 +1,0 @@
-A ce stade nous allons privilegier Cloudformation,c'est plus simple
