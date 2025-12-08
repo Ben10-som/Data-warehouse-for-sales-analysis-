@@ -35,6 +35,13 @@
         "glue:GetTables"
       ],
       "Resource": "*"
-    }
+    },
+    {
+  "Sid": "AllowSelfPasswordChange",
+  "Effect": "Allow",
+  "Action": "iam:ChangePassword",
+  "Resource": "arn:aws:iam::*:user/${aws:username}"
+}
+
   ]
 }
