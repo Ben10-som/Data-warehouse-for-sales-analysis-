@@ -19,7 +19,7 @@
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "aws:ResourceTag/Project": "OlistDWSENSAE2025"
+          "aws:RequestTag/Project": "OlistDWSENSAE2025"
         }
       }
     },
