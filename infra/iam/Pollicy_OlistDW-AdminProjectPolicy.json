@@ -1,0 +1,40 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ProjectWideAdmin",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*",
+        "glue:*",
+        "redshift-serverless:*",
+        "redshift-data:*",
+        "redshift:*",
+        "cloudformation:*",
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Project": "OlistDWSENSAE2025"
+        }
+      }
+    },
+    {
+      "Sid": "GlobalReadAndPassRole",
+      "Effect": "Allow",
+      "Action": [
+        "iam:ListRoles",
+        "iam:GetRole",
+        "iam:PassRole",
+        "s3:ListAllMyBuckets",
+        "glue:GetDatabases",
+        "glue:GetTables"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
