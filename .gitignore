@@ -2,3 +2,5 @@ infra/cloudformation/set.md
 .env
 env/
 data/
+faker-layer/python/
+faker-layer/python.zip
