@@ -1,32 +1,24 @@
 {{ config(materialized='table') }}
 
-WITH base_data AS (
-    SELECT
-        order_id,
-        customer_id,
-        order_status,
-        order_purchase_timestamp,
-        items,      -- Colonne de type SUPER (tableau de JSON)
-        customer    -- Colonne de type SUPER (objet JSON)
-    FROM
-        {{ source('olist_spectrum_schema', 'table_order_sim') }}
-    WHERE
-        order_status = 'approved'
-),
+-- Nous retirons la CTE 'base_data' et allons directement à l'éclatement.
 
-unpivot_items AS (
+WITH unpivot_items AS (
     SELECT
-        order_id,
-        customer_id,
-        order_purchase_timestamp,
+        t.order_id,
+        t.customer_id,
+        t.order_purchase_timestamp,
         -- Eclatement du tableau 'items'. 'item' est l'alias de l'objet JSON individuel.
         item.product_id AS product_id,
         item.price AS price,
         item.freight_value AS freight_value,
-        customer
+        t.customer  -- Sélection de l'objet client pour la prochaine extraction
     FROM
-        base_data AS t,
-        t.items AS item -- Dé-nichage du tableau SUPER
+        -- Référence directe à la source Spectrum avec un alias 't'
+        {{ source('olist_spectrum_schema', 'table_order_sim') }} AS t,
+        -- Dé-nichage du tableau SUPER en utilisant l'alias 't'
+        t.items AS item
+    WHERE
+        t.order_status = 'approved' -- La condition WHERE est appliquée ici
 )
 
 SELECT
