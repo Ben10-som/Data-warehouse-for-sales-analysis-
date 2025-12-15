@@ -1,0 +1,7 @@
+name: 'data_warehouse_for_sales_analysis'
+version: '1.0.0'
+config-version: 2
+profile: 'data_warehouse_for_sales_analysis'
+
+model-paths: ["models"]
+target-path: "target"
