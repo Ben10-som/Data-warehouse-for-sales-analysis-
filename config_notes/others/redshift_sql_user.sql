@@ -12,3 +12,12 @@ GRANT SELECT ON ALL TABLES IN SCHEMA olist_spectrum_schema TO bi_analyst;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA olist_spectrum_schema
 GRANT SELECT ON TABLES TO bi_analyst;
+
+-- Nouveaux droits pour Silver/Gold
+
+GRANT USAGE ON SCHEMA dbt_sim_silver_gold TO bi_analyst;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA dbt_sim_silver_gold TO bi_analyst;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA dbt_sim_silver_gold
+GRANT SELECT ON TABLES TO bi_analyst;
