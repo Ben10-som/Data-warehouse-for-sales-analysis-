@@ -25,8 +25,8 @@ unpivot_items AS (
         item.freight_value AS freight_value,
         customer
     FROM
-        base_data,
-        base_data.items AS item -- Dé-nichage du tableau SUPER
+        base_data AS t,
+        t.items AS item -- Dé-nichage du tableau SUPER
 )
 
 SELECT
