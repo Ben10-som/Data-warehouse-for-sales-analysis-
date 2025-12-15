@@ -111,7 +111,7 @@ def lambda_handler(event, context):
             "order_id": order_id,
             "customer_id": str(uuid.uuid4()),
             "order_status": "approved",
-            "order_purchase_timestamp": sim_time.isoformat(),
+            "order_purchase_timestamp": sim_time.strftime("%Y-%m-%d %H:%M:%S"),
             "items": [{
                 "product_id": product_id,
                 "price": float(random.uniform(20.0, 150.0)),
