@@ -1,18 +1,42 @@
--- silver_sim.sql
--- Transformation des données brutes vers Silver
+{{ config(materialized='table') }}
 
-WITH raw AS (
+WITH base_data AS (
+    SELECT
+        order_id,
+        customer_id,
+        order_status,
+        order_purchase_timestamp,
+        items,      -- Colonne de type SUPER (tableau de JSON)
+        customer    -- Colonne de type SUPER (objet JSON)
+    FROM
+        {{ source('olist_spectrum_schema', 'table_order_sim') }}
+    WHERE
+        order_status = 'approved'
+),
 
-    SELECT *
-    FROM spectrum.olist_dw-sim-catalog
+unpivot_items AS (
+    SELECT
+        order_id,
+        customer_id,
+        order_purchase_timestamp,
+        -- Eclatement du tableau 'items'. 'item' est l'alias de l'objet JSON individuel.
+        item.product_id AS product_id,
+        item.price AS price,
+        item.freight_value AS freight_value,
+        customer
+    FROM
+        base_data,
+        base_data.items AS item -- Dé-nichage du tableau SUPER
 )
 
 SELECT
-    CAST(order_id AS VARCHAR(50))       AS order_id,
-    CAST(customer_id AS VARCHAR(50))    AS customer_id,
-    CAST(product_id AS VARCHAR(50))     AS product_id,
-    CAST(order_date AS DATE)            AS order_date,
-    CAST(price AS DECIMAL(10,2))        AS price,
-    status
-FROM raw
-WHERE order_id IS NOT NULL;
+    order_id,
+    customer_id,
+    order_purchase_timestamp,
+    product_id,
+    (price + freight_value) AS total_price,
+    -- Extraction des champs de l'objet 'customer' avec la notation par point
+    customer.city AS customer_city,
+    customer.state AS customer_state
+FROM
+    unpivot_items

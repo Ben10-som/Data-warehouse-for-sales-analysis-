@@ -1,0 +1,9 @@
+
+version: 2
+
+sources:
+  - name: olist_spectrum_schema 
+    database: dev          
+    schema: olist_spectrum_schema
+    tables:
+      - name: table_order_sim
