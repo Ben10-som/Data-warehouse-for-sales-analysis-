@@ -1,0 +1,26 @@
+[
+  {
+    "Name": "order_id",
+    "Type": "string"
+  },
+  {
+    "Name": "customer_id",
+    "Type": "string"
+  },
+  {
+    "Name": "order_status",
+    "Type": "string"
+  },
+  {
+    "Name": "order_purchase_timestamp",
+    "Type": "timestamp"
+  },
+  {
+    "Name": "items",
+    "Type": "array<struct<product_id:string,price:double,freight_value:double>>"
+  },
+  {
+    "Name": "customer",
+    "Type": "struct<city:string,state:string,zip_code:string>"
+  }
+]
