@@ -3,3 +3,5 @@ infra/cloudformation/set.md
 env/
 logs/
 targets/
+# Ignorer le squelette dbt généré automatiquement
+data_warehouse_for_sales_analysis/
