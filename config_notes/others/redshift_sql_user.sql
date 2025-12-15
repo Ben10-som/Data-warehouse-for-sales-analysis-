@@ -21,3 +21,16 @@ GRANT SELECT ON ALL TABLES IN SCHEMA dbt_sim_silver_gold TO bi_analyst;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA dbt_sim_silver_gold
 GRANT SELECT ON TABLES TO bi_analyst;
+
+
+-- Nouveaux droit pour silver/gold apres changement :
+
+-- 1. Autoriser l'accès au schéma
+GRANT USAGE ON SCHEMA dbt_sim_silver_gold TO bi_analyst;
+
+-- 2. Donner les droits SELECT sur les tables actuelles (gold_sim vient d'être recréée)
+GRANT SELECT ON ALL TABLES IN SCHEMA dbt_sim_silver_gold TO bi_analyst;
+
+-- 3. Définir les droits par défaut pour que les prochains "dbt run" donnent automatiquement les droits
+ALTER DEFAULT PRIVILEGES IN SCHEMA dbt_sim_silver_gold
+GRANT SELECT ON TABLES TO bi_analyst;
