@@ -6,6 +6,6 @@ data/
 faker-layer/python/
 faker-layer/python.zip
 logs/
-targets/
+target/
 # Ignorer le squelette dbt généré automatiquement
 data_warehouse_for_sales_analysis/

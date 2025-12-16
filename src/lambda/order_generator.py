@@ -132,9 +132,17 @@ def lambda_handler(event, context):
         )
         orders_created.append(order_id)
 
-    update_simulation_time(sim_time, speed_factor)
+    # On avance de X minutes, où X = nombre de commandes générées × speed_factor
+    minutes_to_add = len(orders_created) * speed_factor
+    new_sim_time = update_simulation_time(sim_time, minutes_to_add)
     
     return {
-        'statusCode': 200,
-        'body': json.dumps(f"Generated {len(orders_created)} orders. New Time: {sim_time}")
-    }
+    'statusCode': 200,
+    'body': json.dumps({
+        'message': f"Generated {len(orders_created)} orders",
+        'orders_generated': len(orders_created),
+        'previous_time': sim_time.isoformat(),
+        'new_time': new_sim_time.isoformat(),
+        'minutes_advanced': minutes_to_add
+    })
+}

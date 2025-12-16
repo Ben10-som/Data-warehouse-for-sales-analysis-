@@ -1,32 +1,19 @@
 {{ config(materialized='table') }}
 
-WITH base_data AS (
+WITH unpivot_items AS (
     SELECT
-        order_id,
-        customer_id,
-        order_status,
-        order_purchase_timestamp,
-        items,      -- Colonne de type SUPER (tableau de JSON)
-        customer    -- Colonne de type SUPER (objet JSON)
-    FROM
-        {{ source('olist_spectrum_schema', 'table_order_sim') }}
-    WHERE
-        order_status = 'approved'
-),
-
-unpivot_items AS (
-    SELECT
-        order_id,
-        customer_id,
-        order_purchase_timestamp,
-        -- Eclatement du tableau 'items'. 'item' est l'alias de l'objet JSON individuel.
+        t.order_id,
+        t.customer_id,
+        t.order_purchase_timestamp,
         item.product_id AS product_id,
         item.price AS price,
         item.freight_value AS freight_value,
-        customer
+        t.customer  -- L'objet customer struct
     FROM
-        base_data,
-        base_data.items AS item -- Dé-nichage du tableau SUPER
+        {{ source('olist_spectrum_schema', 'table_order_sim') }} AS t,
+        t.items AS item
+    WHERE
+        t.order_status = 'approved'
 )
 
 SELECT
@@ -35,8 +22,8 @@ SELECT
     order_purchase_timestamp,
     product_id,
     (price + freight_value) AS total_price,
-    -- Extraction des champs de l'objet 'customer' avec la notation par point
-    customer.city AS customer_city,
-    customer.state AS customer_state
+    -- CORRECTION : Caster le résultat de l'extraction SUPER en VARCHAR avant d'utiliser TRIM
+    TRIM(customer.city::VARCHAR, '"') AS customer_city,
+    TRIM(customer.state::VARCHAR, '"') AS customer_state
 FROM
     unpivot_items
