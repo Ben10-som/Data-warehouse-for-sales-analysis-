@@ -1,0 +1,3 @@
+# Config d'un container sur AWS
+
+pour les commandes CLI  il suffit de les copier directement apres creation du container sur ECR
