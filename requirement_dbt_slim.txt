@@ -1,2 +1,2 @@
-dbt-core==1.7.9
-dbt-redshift==1.7.9
+dbt-core==1.7.7
+dbt-redshift==1.7.7
