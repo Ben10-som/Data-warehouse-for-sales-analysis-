@@ -39,6 +39,7 @@
 
 
 
+# speed_factor = 60 signifie desormais :le délai entre deux commandes peut aller jusqu’à 60 minutes environ
 
 import boto3
 import json
