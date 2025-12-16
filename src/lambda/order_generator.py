@@ -1,3 +1,45 @@
+        ########################################################################################
+        # À chaque exécution, la fonction génère un nombre aléatoire de commandes,
+        # mais chacune ne contient qu’un seul produit.
+        #
+        # Techniquement, il serait possible d’ajouter plusieurs produits par commande
+        # en alimentant la liste `items`. Cependant, cela oblige à changer la consommation
+        # côté AWS Firehose, qui considère par défaut une seule table cible.
+        #
+        # Dans ce cas, il faudrait adapter :
+        #   - le schéma externe Glue,
+        #   - la transformation Silver dans dbt,
+        #   - et les paramètres de livraison Firehose (par ex. activer le partitionnement dynamique pour alimenter plusieurs dossiers S3).
+        #
+        # En pratique, cette évolution permettrait de transformer notre projet
+        # en un véritable jumeau numérique temps réel, avec plusieurs consommateurs
+        # branchés sur le même Kinesis Data Stream.
+                #
+        # Dans un vrai site comme Olist, DynamoDB est un bon choix car :
+        #   - On ne fait pas de scan complet, mais des requêtes ciblées
+        #     grâce aux clés primaires et aux index globaux secondaires (GSI).
+        #   - Les accès sont optimisés pour récupérer directement un produit,
+        #     un client ou une commande sans parcourir toute la table.
+        #   - DynamoDB supporte des millions de requêtes par seconde
+        #     avec une latence très faible, idéal pour un e-commerce.
+        #   - Il s’intègre nativement avec Kinesis, Lambda, Glue et même Redshift avec Dynamodb Stream,
+        #     ce qui simplifie la mise en place d’un pipeline temps réel.
+        #
+        # Notre choix de DynamoDB est donc justifié :
+        #   - il sert de socle transactionnel fiable,
+        #   - il est hautement disponible et résilient,
+        #   - et il permet de prototyper rapidement un jumeau numérique qui ressemble au vrai site web
+        #
+        # Les scans qu’on utilise ici sont juste une simplification
+        # pour la simulation. Dans la vraie vie, Olist utiliserait
+        # des requêtes indexées et du caching (Redis/DAX) pour éviter
+        # toute surcharge et garantir la performance.
+        ########################################################################################
+
+
+
+
+
 import boto3
 import json
 import random
