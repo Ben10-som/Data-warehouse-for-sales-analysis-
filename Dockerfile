@@ -4,7 +4,7 @@ FROM python:3.11-slim
 WORKDIR /usr/app
 
 # Copier le fichier des dépendances Python
-COPY requirements.txt .
+COPY requirement.txt .
 
 # Installer dbt-redshift et les autres dépendances
 RUN pip install --no-cache-dir -r requirement.txt
