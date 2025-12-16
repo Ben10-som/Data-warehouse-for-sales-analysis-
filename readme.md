@@ -1,8 +1,51 @@
-# TP BIG DATA - CLOUD COMPITTING - ISE 2 2025
+# Data Warehouse – Analyse des ventes et satisfaction client
 
-## Data werhouse sur AWS avec le dataset Olist Brazil
+![](olist.png)
 
-## Plan de travail
-Le projet est divisé en 4 phases.
-### Phase 0
-La Phase 0 est la base du projet : préparer l’infrastructure, les buckets , uploader les données historiques et s’assurer que les pipelines et les contrôles de coûts sont prêts. L’objectif est livrer un environnement reproductible, sécurisé et peu coûteux sur lequel les phases suivantes pourront s’appuyer.
+## Description
+Ce projet consiste à mettre en place un **Data Warehouse** afin d’analyser les **ventes**, le **comportement des clients** et la **satisfaction client**, puis à créer des **tableaux de bord Power BI** pour faciliter la prise de décision.
+
+---
+
+## Objectifs
+- Centraliser les données
+- Nettoyer et structurer les données
+- Analyser les ventes et la satisfaction client
+- Visualiser les résultats avec Power BI
+
+---
+
+## Données
+- Commandes
+- Clients
+- Produits
+- Avis clients (scores de 1 à 5)
+
+---
+
+## Outils utilisés
+- Power BI
+- Power Query
+- SQL
+- GitHub
+
+---
+
+## Résultats
+- Tableaux de bord interactifs
+- Indicateurs clés sur les ventes
+- Analyse de la satisfaction client
+
+---
+
+## Auteur
+Judicaël Oscar Gandwende KAFANDO
+
+Ramatoulaye NDEYE NDOYE FALL
+
+Djerakei MISTALENGAR
+
+Ben Idriss Diloma SOMA
+
+Moussa DIEME
+ENSAE Dakar
