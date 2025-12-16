@@ -40,8 +40,12 @@ Ce projet consiste à mettre en place un **Data Warehouse** afin d’analyser le
 
 ## Auteur
 Judicaël Oscar Gandwende KAFANDO
+
 Ramatoulaye NDEYE NDOYE FALL
+
 Djerakei MISTALENGAR
+
 Ben Idriss Diloma SOMA
+
 Moussa DIEME
 ENSAE Dakar
