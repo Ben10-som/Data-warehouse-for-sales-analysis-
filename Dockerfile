@@ -7,7 +7,7 @@ WORKDIR /usr/app
 COPY requirements.txt .
 
 # Installer dbt-redshift et les autres dépendances
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirement.txt
 
 # Copier l'intégralité de votre projet dbt dans le conteneur
 COPY . .
