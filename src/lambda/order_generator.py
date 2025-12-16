@@ -46,6 +46,8 @@ import random
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
+import math
+
 from faker import Faker
 
 
@@ -123,6 +125,10 @@ def get_random_product():
 
 def lambda_handler(event, context):
     sim_time, speed_factor = get_simulation_state()
+    # horloge virtuelle progressive (on la fait avancer commande par commande)
+    current_virtual_time = sim_time
+    total_advanced_seconds = 0.0
+
     orders_created = []
     
     # On génère entre 3 et 20 commandes par execution
@@ -147,13 +153,25 @@ def lambda_handler(event, context):
             print(f"Out of stock for {product_id}: {str(e)}")
             continue # Skip order
 
+
+        #  attribution d'un timestamp unique et réaliste pour chaque commande
+        # offset aléatoire borné par speed_factor 
+        offset_seconds = random.uniform(0, max(1, speed_factor) * 60)  
+        # jitter de 0..59 secondes pour éviter des timestamps trop "propres"
+        jitter_seconds = random.uniform(0, 59)
+        increment = timedelta(seconds=offset_seconds + jitter_seconds)
+
+        # avancer l'horloge virtuelle progressive
+        current_virtual_time = current_virtual_time + increment
+        total_advanced_seconds += (offset_seconds + jitter_seconds)
+
         # 2. Création de la donnée (Format Olist enrichi)
         order_id = str(uuid.uuid4())
         order = {
             "order_id": order_id,
             "customer_id": str(uuid.uuid4()),
             "order_status": "approved",
-            "order_purchase_timestamp": sim_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "order_purchase_timestamp": current_virtual_time.strftime("%Y-%m-%d %H:%M:%S"),
             "items": [{
                 "product_id": product_id,
                 "price": float(random.uniform(20.0, 150.0)),
@@ -174,9 +192,10 @@ def lambda_handler(event, context):
         )
         orders_created.append(order_id)
 
-    # On avance de X minutes, où X = nombre de commandes générées × speed_factor
-    minutes_to_add = len(orders_created) * speed_factor
+    # Convertir la somme des secondes avancées en minutes 
+    minutes_to_add = math.ceil(total_advanced_seconds / 60) if total_advanced_seconds > 0 else 0
     new_sim_time = update_simulation_time(sim_time, minutes_to_add)
+
     
     return {
     'statusCode': 200,
