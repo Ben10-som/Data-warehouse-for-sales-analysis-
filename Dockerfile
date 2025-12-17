@@ -5,7 +5,7 @@ WORKDIR /usr/app
 
 
 RUN pip install --upgrade pip \
- && pip install dbt-redshif
+ && pip install dbt-redshift
 
 COPY . .
 # Ce fichier contient la configuration qui permet à dbt d'utiliser les variables d'environnement HOST/USER/PASSWORD.
