@@ -7,7 +7,16 @@
       "Resource": "arn:aws:states:::ecs:runTask.sync",
       "Parameters": {
         "Cluster": "arn:aws:ecs:[VOTRE_RÉGION]:[VOTRE_ID_COMPTE]:cluster/dbt-cluster-olist",
-        "TaskDefinition": "arn:aws:ecs:[VOTRE_RÉGION]:[VOTRE_ID_COMPTE]:task-definition/dbt-runner-fargate",
+        "TaskDefinition": "arn:aws:ecs:[VOTRE_RÉGION]:[VOTRE_ID_COMPTE]:task-definition/dbt-runner-fargate:2", 
+        # Modification de la definition du task ==> nouvelle version car il faut:
+         "secrets": [
+    {
+      "name": "DBT_REDSHIFT_PASSWORD",
+      "valueFrom": "arn:aws:secretsmanager:eu-west-3:355142185625:secret:nom-du-secret:password::"
+    }
+    Le :password:: à la fin de l'ARN est crucial.
+     Il indique à ECS d'extraire uniquement la valeur associée à la clé "password" dans le JSON.
+        ],  
         "LaunchType": "FARGATE",
         "Overrides": {
           "ContainerOverrides": [
