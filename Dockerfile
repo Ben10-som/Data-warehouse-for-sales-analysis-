@@ -9,6 +9,6 @@ RUN pip install --upgrade pip \
 
 COPY . .
 # Ce fichier contient la configuration qui permet à dbt d'utiliser les variables d'environnement HOST/USER/PASSWORD.
-COPY profiles.yml /usr/app/profiles.yml
+COPY profiles_for_docker_dbt.yml /usr/app/profiles.yml
 
 CMD ["dbt", "run"]
