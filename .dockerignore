@@ -1,0 +1,13 @@
+# Ignorer tous les dossiers
+*/
+
+# Réinclure uniquement le dossier models
+!models/
+
+# Garder les fichiers de la racine
+!*.py
+!*.yml
+!*.sql
+!*.md
+!*.json
+!*.sh

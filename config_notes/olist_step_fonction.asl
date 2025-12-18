@@ -1,13 +1,56 @@
 {
-  "Comment": "Lance dbt run via ECS Fargate et attend la complétion.",
-  "StartAt": "RunDbtTask",
+  "Comment": "Déclenche dbt avec cooldown de 5 minutes après détection S3",
+  "StartAt": "CheckIfAnotherRunIsActive",
   "States": {
+    "CheckIfAnotherRunIsActive": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:sfn:listExecutions",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "StatusFilter": "RUNNING",
+        "MaxResults": 1
+      },
+      "ResultPath": "$.running",
+      "Next": "IsAlreadyRunning"
+    },
+
+    "IsAlreadyRunning": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.running.executions[0]",
+          "IsPresent": true,
+          "Next": "IgnoreEvent"
+        }
+      ],
+      "Default": "WaitFiveMinutes"
+    },
+
+    "IgnoreEvent": {
+      "Type": "Succeed"
+    },
+
+    "WaitFiveMinutes": {
+      "Type": "Wait",
+      "Seconds": 300,
+      "Next": "RunDbtTask"
+    },
+
     "RunDbtTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
       "Parameters": {
         "Cluster": "arn:aws:ecs:[VOTRE_RÉGION]:[VOTRE_ID_COMPTE]:cluster/dbt-cluster-olist",
-        "TaskDefinition": "arn:aws:ecs:[VOTRE_RÉGION]:[VOTRE_ID_COMPTE]:task-definition/dbt-runner-fargate",
+        "TaskDefinition": "arn:aws:ecs:[VOTRE_RÉGION]:[VOTRE_ID_COMPTE]:task-definition/dbt-runner-fargate:2", 
+        # Modification de la definition du task ==> nouvelle version car il faut:
+         "secrets": [
+    {
+      "name": "DBT_REDSHIFT_PASSWORD",
+      "valueFrom": "arn:aws:secretsmanager:eu-west-3:355142185625:secret:nom-du-secret:password::"
+    }
+    Le :password:: à la fin de l'ARN est crucial.
+     Il indique à ECS d'extraire uniquement la valeur associée à la clé "password" dans le JSON.
+        ],  
         "LaunchType": "FARGATE",
         "Overrides": {
           "ContainerOverrides": [
