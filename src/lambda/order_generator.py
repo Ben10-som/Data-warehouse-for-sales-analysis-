@@ -1,9 +1,54 @@
+        ########################################################################################
+        # À chaque exécution, la fonction génère un nombre aléatoire de commandes,
+        # mais chacune ne contient qu’un seul produit.
+        #
+        # Techniquement, il serait possible d’ajouter plusieurs produits par commande
+        # en alimentant la liste `items`. Cependant, cela oblige à changer la consommation
+        # côté AWS Firehose, qui considère par défaut une seule table cible.
+        #
+        # Dans ce cas, il faudrait adapter :
+        #   - le schéma externe Glue,
+        #   - la transformation Silver dans dbt,
+        #   - et les paramètres de livraison Firehose (par ex. activer le partitionnement dynamique pour alimenter plusieurs dossiers S3).
+        #
+        # En pratique, cette évolution permettrait de transformer notre projet
+        # en un véritable jumeau numérique temps réel, avec plusieurs consommateurs
+        # branchés sur le même Kinesis Data Stream.
+                #
+        # Dans un vrai site comme Olist, DynamoDB est un bon choix car :
+        #   - On ne fait pas de scan complet, mais des requêtes ciblées
+        #     grâce aux clés primaires et aux index globaux secondaires (GSI).
+        #   - Les accès sont optimisés pour récupérer directement un produit,
+        #     un client ou une commande sans parcourir toute la table.
+        #   - DynamoDB supporte des millions de requêtes par seconde
+        #     avec une latence très faible, idéal pour un e-commerce.
+        #   - Il s’intègre nativement avec Kinesis, Lambda, Glue et même Redshift avec Dynamodb Stream,
+        #     ce qui simplifie la mise en place d’un pipeline temps réel.
+        #
+        # Notre choix de DynamoDB est donc justifié :
+        #   - il sert de socle transactionnel fiable,
+        #   - il est hautement disponible et résilient,
+        #   - et il permet de prototyper rapidement un jumeau numérique qui ressemble au vrai site web
+        #
+        # Les scans qu’on utilise ici sont juste une simplification
+        # pour la simulation. Dans la vraie vie, Olist utiliserait
+        # des requêtes indexées et du caching (Redis/DAX) pour éviter
+        # toute surcharge et garantir la performance.
+        ########################################################################################
+
+
+
+
+# speed_factor = 60 signifie desormais :le délai entre deux commandes peut aller jusqu’à 60 minutes environ
+
 import boto3
 import json
 import random
 import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
+import math
+
 from faker import Faker
 
 
@@ -81,6 +126,10 @@ def get_random_product():
 
 def lambda_handler(event, context):
     sim_time, speed_factor = get_simulation_state()
+    # horloge virtuelle progressive (on la fait avancer commande par commande)
+    current_virtual_time = sim_time
+    total_advanced_seconds = 0.0
+
     orders_created = []
     
     # On génère entre 3 et 20 commandes par execution
@@ -105,13 +154,25 @@ def lambda_handler(event, context):
             print(f"Out of stock for {product_id}: {str(e)}")
             continue # Skip order
 
+
+        #  attribution d'un timestamp unique et réaliste pour chaque commande
+        # offset aléatoire borné par speed_factor 
+        offset_seconds = random.uniform(0, max(1, speed_factor) * 60)  
+        # jitter de 0..59 secondes pour éviter des timestamps trop "propres"
+        jitter_seconds = random.uniform(0, 59)
+        increment = timedelta(seconds=offset_seconds + jitter_seconds)
+
+        # avancer l'horloge virtuelle progressive
+        current_virtual_time = current_virtual_time + increment
+        total_advanced_seconds += (offset_seconds + jitter_seconds)
+
         # 2. Création de la donnée (Format Olist enrichi)
         order_id = str(uuid.uuid4())
         order = {
             "order_id": order_id,
             "customer_id": str(uuid.uuid4()),
             "order_status": "approved",
-            "order_purchase_timestamp": sim_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "order_purchase_timestamp": current_virtual_time.strftime("%Y-%m-%d %H:%M:%S"),
             "items": [{
                 "product_id": product_id,
                 "price": float(random.uniform(20.0, 150.0)),
@@ -132,9 +193,10 @@ def lambda_handler(event, context):
         )
         orders_created.append(order_id)
 
-    # On avance de X minutes, où X = nombre de commandes générées × speed_factor
-    minutes_to_add = len(orders_created) * speed_factor
+    # Convertir la somme des secondes avancées en minutes 
+    minutes_to_add = math.ceil(total_advanced_seconds / 60) if total_advanced_seconds > 0 else 0
     new_sim_time = update_simulation_time(sim_time, minutes_to_add)
+
     
     return {
     'statusCode': 200,

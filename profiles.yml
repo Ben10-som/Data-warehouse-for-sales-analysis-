@@ -1,0 +1,17 @@
+# profiles.yml 
+#
+# Ce profil.yml ne servira que pour l'environnement docker, en local dbt run cree 
+# son propre profiles.yml dans ~/.dbt/profiles.yml , suffit juste d'y inserer ses infos
+data_warehouse_for_sales_analysis:
+  target: dev
+  outputs:
+    dev:
+      type: redshift
+      method: "database" # Utilise la méthode classique utilisateur/mot de passe
+      host: "{{ env_var('DBT_REDSHIFT_HOST') }}"
+      user: "{{ env_var('DBT_REDSHIFT_USER') }}" 
+      password: "{{ env_var('DBT_REDSHIFT_PASSWORD') }}" # Sera lu depuis Secrets Manager
+      port: 5439
+      dbname: dev 
+      schema: dbt_sim_silver_gold
+      threads: 4
