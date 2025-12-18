@@ -1,7 +1,41 @@
 {
-  "Comment": "Lance dbt run via ECS Fargate et attend la complétion.",
-  "StartAt": "RunDbtTask",
+  "Comment": "Déclenche dbt avec cooldown de 5 minutes après détection S3",
+  "StartAt": "CheckIfAnotherRunIsActive",
   "States": {
+    "CheckIfAnotherRunIsActive": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:sfn:listExecutions",
+      "Parameters": {
+        "StateMachineArn.$": "$$.StateMachine.Id",
+        "StatusFilter": "RUNNING",
+        "MaxResults": 1
+      },
+      "ResultPath": "$.running",
+      "Next": "IsAlreadyRunning"
+    },
+
+    "IsAlreadyRunning": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.running.executions[0]",
+          "IsPresent": true,
+          "Next": "IgnoreEvent"
+        }
+      ],
+      "Default": "WaitFiveMinutes"
+    },
+
+    "IgnoreEvent": {
+      "Type": "Succeed"
+    },
+
+    "WaitFiveMinutes": {
+      "Type": "Wait",
+      "Seconds": 300,
+      "Next": "RunDbtTask"
+    },
+
     "RunDbtTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
