@@ -5,6 +5,13 @@
 ## Description
 Ce projet consiste à mettre en place un **Data Warehouse** afin d’analyser les **ventes**, le **comportement des clients** et la **satisfaction client**, puis à créer des **tableaux de bord Power BI** pour faciliter la prise de décision.
 
+![Illustration step function](workflow_stepfunction.png)
+
+![workflow](workflow_real_time_input.png)
+
+![workflow](workflow_real_time_outupt1.png)
+![workflow](workflow_real_time_outupt2.png)
+
 ---
 
 ## Objectifs
